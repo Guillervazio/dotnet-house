@@ -1,0 +1,5 @@
+{
+  "name": "dotnet-house",
+  "description": "House conventions for .NET solutions: the portable half of the rules, the decisions that predate any one project, the procedures worth invoking, and a Stop hook that refuses to end a turn on a broken build.",
+  "version": "0.1.0"
+}
