@@ -23,6 +23,11 @@ It is not an argument against pessimistic locking in general, and it does not li
 decorator that hides contention instead of surfacing it. A conflict that reaches the caller is
 information.
 
+## Origin
+
+Split from one earlier entry, 0008, into the criterion and its application. The application half is
+a project decision, and belongs to whichever project made it.
+
 ## Evidence outside this project
 
 Optimistic concurrency control predates every ORM that implements it; the read-modify-write

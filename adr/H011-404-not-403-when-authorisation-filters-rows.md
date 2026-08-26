@@ -22,6 +22,11 @@ It does not turn every 403 into a 404. Where a policy governs the endpoint as a 
 is the same for everyone the policy admits — a refusal is a refusal and 403 is correct. This is
 only for the case where authorisation is selecting rows.
 
+## Origin
+
+Split from one earlier entry, 0021, into the criterion and its application. The application half is
+a project decision, and belongs to whichever project made it.
+
 ## Evidence outside this project
 
 Standard practice for authorisation that is row-scoped: not confirming the existence of a resource

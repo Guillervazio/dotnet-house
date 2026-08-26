@@ -20,6 +20,11 @@ names the fields; the 400 body cannot, because the fields were never parsed.
 422 is not a bucket for every refusal. A conflict with existing state is 409, and a rule the caller
 is not entitled to trigger is an authorisation answer, not a validation one.
 
+## Origin
+
+Split from one earlier entry, 0005, into the criterion and its application. The application half is
+a project decision, and belongs to whichever project made it.
+
 ## Evidence outside this project
 
 The semantics are in the HTTP specification for 422 (originally WebDAV, now part of the core HTTP
