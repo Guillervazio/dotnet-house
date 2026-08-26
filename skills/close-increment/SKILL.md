@@ -15,6 +15,9 @@ dotnet build            # zero warnings, not "only warnings"
 dotnet test             # every project, including the ones needing a container
 ```
 
+**Zero skipped, zero ignored, zero flaky.** "Tests pass in full" is satisfied by a suite full of
+skipped tests, so read the counts rather than the word `Passed`.
+
 The Stop hook runs the build and the fast suite every turn. It does **not** run the
 container-backed suites, so this is the first point at which they have been executed.
 

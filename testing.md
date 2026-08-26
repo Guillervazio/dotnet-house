@@ -14,13 +14,20 @@ Every feature ships with tests. A feature without them is not done.
 
 * **Unit** — domain and application logic in isolation. No database, no network, no file system, no
   container, no DI container. Dependencies substituted. Very fast.
-* **Integration** — repositories, DI wiring, orchestration, against a real database.
-* **Persistence** — mappings, constraints, converters, indexes, query translation.
+* **Integration** — repositories, DI wiring, orchestration, against a real database. A third party
+  is still substituted: "integration" means the layers of this system, not somebody else's.
+* **Persistence** — mappings, constraints, converters, indexes, **relationships and their delete
+  behaviour**, transactions, query translation.
 * **Scenario** — whole business scenarios through the real HTTP pipeline, asserting the response
-  envelope and the rows behind it.
+  envelope and the rows behind it, **including the 401 and 403 paths**. An endpoint whose refusals
+  are untested is an endpoint whose authorisation is untested.
 
 A unit test suite never references the infrastructure project. Needing it means the test is not a
 unit test.
+
+Most tests are unit tests, and the count thins out as the categories get slower. It is the
+proportion that keeps the fast gate worth running: a suite where every new test is a scenario test
+conforms to every rule here and still takes minutes to tell you anything.
 
 ## The suite inventory the appendix must fill
 
@@ -44,9 +51,19 @@ FluentAssertions for assertions. NSubstitute for substitutes, and only for depen
 genuinely external — never a value object, an entity, a record or a plain DTO. `FakeTimeProvider`
 for time; never assert against the real clock.
 
+## Independence
+
+No test depends on another having run, on the order they run in, or on state a previous one left
+behind — and that is not only about database rows. A static mutable field, a fixture property one
+test writes and the next reads, and a shared collection are the same coupling without a container
+to reset. The suite with no container is the one most exposed to it.
+
 ## Naming and shape
 
 `MethodName_Should_ExpectedBehaviour_When_Condition`.
+
+**One action, one logical assertion.** That is what "too large" means concretely: a test exercising
+two calls, or asserting two unrelated facts, is two tests.
 
 The three phases are separated by a **blank line and nothing else**. Do not write `// Arrange`,
 `// Act`, `// Assert`: a comment restating the code is noise in a test the same as anywhere. A test
@@ -94,5 +111,16 @@ one that differs per machine has left this case. Do not read this as "unit tests
 
 ## Coverage
 
-Domain business rules require tests. There is deliberately **no percentage here**: a number nobody
-measures is worse than no target, and adding coverage measurement is a decision with its own cost.
+Domain business rules require tests, and **an endpoint is covered when its failure paths are** —
+the validation refusal, the not-found, the conflict. A new action with only its happy path tested
+is a new action untested, because the happy path is the one that was written while looking at it.
+
+There is deliberately **no percentage here**: a number nobody measures is worse than no target, and
+adding coverage measurement is a decision with its own cost. Do not write a test to move a number.
+
+## Not done
+
+**No skipped test, no ignored test, no flaky test.** A suite reported green with a `Skip` attribute
+in it is a suite whose report is false, and a test that passes on the second run is a test that
+tells you nothing on the first. Delete it or fix it; parking it is the option that is not
+available.

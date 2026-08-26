@@ -30,6 +30,12 @@ experimental packages. No two packages covering one concern. Prefer a built-in o
 A package is referenced only by the project that uses it, never solution-wide. Adding one means
 updating the appendix in the same change.
 
+**Raising a version needs approval too.** An approved package is approved at a version, not
+forever: a major bump can change a licence, a test platform or a transitive dependency, and a
+version declared here may be pinned in step with a tool version somewhere else — a container
+stage, a CI image — that nothing will remind you about. Reviewing what is outdated is free;
+acting on it is not.
+
 Two ownership rules are structural rather than taste:
 
 * **The domain project references no NuGet package at all**, beyond the base class library. It is

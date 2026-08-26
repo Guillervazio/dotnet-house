@@ -24,6 +24,18 @@ the only thing it is allowed to do with a database failure is **translate** it.
 * **Table and column names are declared explicitly** in each configuration — `ToTable` and
   `HasColumnName` — never inferred from the model class name. No naming-convention package: a
   rename in code must not silently rename a column in a database that already holds rows.
+* **Column constraints are declared, never left to a provider default.** Maximum length on every
+  string, precision and scale on every decimal, required versus optional on every property. A
+  money column without precision becomes whatever the provider picks, and a string without a
+  length becomes unbounded text — both invisible until the migration is already applied.
+* **Relationships are configured explicitly**, and that includes the delete behaviour. **This one
+  is load-bearing:** the default for a required foreign key is *cascade*, so a relationship
+  written without it makes deleting a parent delete its children. Where the child is an audit
+  record, that silently destroys history the domain went to some length to make immutable.
+  `Restrict` or `NoAction` unless cascade is what the business actually asked for.
+* **A multi-field value object is an owned type**, not an entity with an identity of its own. It
+  has no independent existence, so giving it a key and a table invites it to be loaded and saved
+  apart from the aggregate that owns it.
 
 ## The context stays lightweight
 
@@ -77,6 +89,23 @@ a version or a store-owned timestamp; the moment it carries a column belonging t
 aggregate it has become a read model and belongs behind a query object. Read literally the rule
 above forbids the pair, and it survives because of what it protects: the caller still gets the
 whole saveable aggregate, with nothing projected away.
+
+## Reading
+
+* **`AsNoTracking` on every read-only query.** Tracking is for a read whose entity is about to be
+  modified, and nothing else. A tracked listing puts a page's worth of aggregates in the change
+  tracker for no reason.
+* **Filter, sort and page on the server.** Never materialise and then narrow: a `ToList` before a
+  `Where` reads the table to return twenty rows, and it is the failure a paged repository is most
+  likely to hit. Project only the columns the response carries.
+* **No lazy loading**, and no lazy-loading proxies. A hidden query per property access is a
+  performance problem that only appears under load.
+
+## Logging
+
+SQL logging is a development affordance. **Sensitive-data logging is never enabled outside
+development** — it is one line to turn on and it puts parameter values, which is to say the data
+itself, into the log.
 
 ## Indexes
 

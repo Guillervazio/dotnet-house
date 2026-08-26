@@ -39,12 +39,26 @@ means the test is not a unit test — not that the reference is missing.
 * **Application** — no persistence implementations, no HTTP concerns: no request context, no status
   codes, no action results. A handler that knows it is being called over HTTP cannot be reused by
   anything that is not.
-* **Contracts** — records only. No behaviour, no domain types, no validation attributes. See
+* **Contracts** — records only. No behaviour, no domain types, no validation attributes, and **no
+  framework at all** beyond serialisation attributes. A binding attribute or a documentation
+  package here couples every client that consumes the contracts to this API's web stack. See
   [H004](adr/H004-separate-contracts-project.md).
+* **Infrastructure** — **no business rules.** It implements the abstractions whose concrete
+  dependency it owns, and the only thing it may do with a failure from a third party is translate
+  it.
 * **Api** — no business rules, no direct database access. A controller binds the request, calls one
   handler, maps the result.
 
 Application and Infrastructure each expose registration as a single extension method.
+
+## Persistence abstractions, declared here and implemented elsewhere
+
+The interfaces live in Application, so this is where the rule has to be stated — the persistence
+rules load for the implementing project, and by then the interface is already written.
+
+Repositories expose **aggregate roots**, never an `IQueryable`. A read that spans aggregates is a
+query object rather than a repository method —
+[H006](adr/H006-query-objects-for-cross-aggregate-reads.md).
 
 ## Which layer implements an abstraction
 

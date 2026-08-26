@@ -13,8 +13,12 @@ without a project ADR is not a deviation, it is drift.
 
 `.editorconfig` plus `EnforceCodeStyleInBuild` and `TreatWarningsAsErrors` **fail the build** on:
 explicit types over `var`, braces on every block, explicit access modifiers, file-scoped
-namespaces, `using` outside the namespace, unmarked `readonly` fields, naming, and nullable
-violations. None of that is written down again here — the compiler says it louder and sooner.
+namespaces, `using` outside the namespace, unmarked `readonly` fields, **symbol** naming, and
+nullable violations. None of that is written down again here — the compiler says it louder and
+sooner.
+
+Symbol naming means types, members, parameters and locals. It does **not** cover file or folder
+names: those are PascalCase by convention and nothing checks them.
 
 Four more are corrected by `dotnet format` and **not** by the build: `using` order, whitespace,
 redundant `this.`, and `System.Int32` for `int`. They are enforced only because the Stop hook runs
@@ -48,10 +52,44 @@ Do not use an exception for the query case.
 Never suppress a warning with `!` unless it is provably safe, and write the reason in a comment
 where you do.
 
-## Cancellation
+## Asynchrony
 
 Every method that performs I/O takes a `CancellationToken` and passes it down. No analyser enforces
-this by default.
+this by default — and neither of the two below is caught by anything either:
+
+* **Never `.Result` or `.Wait()`.** Blocking on a task holds a request thread and deadlocks under
+  a synchronisation context.
+* **Never `async void`** outside an event handler. Its exception cannot be caught by the caller and
+  takes the process down.
+
+## Exceptions
+
+* **Never swallow one.** An empty `catch` is silent to the compiler and to every analyser here.
+* **A domain exception derives from the layer's common base type.** One that does not is not
+  recognised by the error mapping, so a deliberate business refusal is served as a 500.
+* **Never for expected control flow**, and log an unexpected one **once**, at the boundary that
+  handles it. Logging and rethrowing gets the same failure recorded twice.
+
+## Dependency injection
+
+* **Constructor injection only.** No property or setter injection.
+* **Never inject the service provider** into application code to resolve dependencies on demand.
+  That is a service locator, and it hides what a type actually needs.
+* **Lifetimes are a correctness concern, not a tuning one.** Anything holding per-request state —
+  the persistence context, repositories, handlers, validators — is scoped. A captive dependency
+  (a singleton holding a scoped one) leaks state across requests, and no test in a suite reliably
+  surfaces it.
+
+## Size and shape
+
+One responsibility per method, early returns over nested conditionals, and nesting no deeper than
+three. Nothing enforces any of this; it is the part a reviewer has to carry.
+
+## Magic values
+
+No bare numbers or strings with meaning. A published identifier is a constant, a bounded set is an
+enum, a value with rules is a value object. This is what keeps a code, a permission or a threshold
+from acquiring a second, different copy somewhere else.
 
 ## Static classes
 

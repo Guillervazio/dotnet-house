@@ -26,6 +26,18 @@ share one, so a client writes one deserialisation path.
   never an internal property path. Every producer of a detail normalises through one helper, or two
   of them will disagree and a client that matches by string will silently fail on the rarer one.
 
+## Route shape
+
+Plural nouns, kebab-case for multi-word segments, and **the method states the action** — never a
+verb in the path. An operation that is not one of the verbs is a sub-resource, named as a noun.
+
+**One level of nesting is the limit.** A second level is a filter wearing a path, and it forces a
+route to answer for the existence of two resources instead of one.
+
+A new **major version** is a new folder and new controllers. An existing version's controllers are
+frozen against breaking changes: that is what a version is for, and editing one in place makes the
+number a decoration.
+
 ## Which status code
 
 * **422** for a well-formed request a rule refused; **400** only for one that could not be read at
@@ -34,6 +46,13 @@ share one, so a client writes one deserialisation path.
 * **404** where authorisation filters rows —
   [H011](adr/H011-404-not-403-when-authorisation-filters-rows.md).
 * **500** carries a generic message; the detail is logged, not returned.
+* **201** for a create, **with a `Location` header pointing at what was created** — a client that
+  has to guess the URL of the thing it just made is a client doing the server's work.
+* **200**, or **204** when there is nothing to return.
+
+`PUT` **replaces the resource in full**: it takes every editable field, not the changed ones. That
+is why a partial update is not a `PUT`, and why a `PUT` body missing a field is a field being
+cleared rather than a field being left alone.
 
 Errors are produced centrally by one exception handler. A controller never builds an error response
 by hand and never contains a `try/catch` for error shaping.
@@ -81,6 +100,9 @@ exposing primitives.
 * `sortBy` accepts an allow-list per endpoint; an unknown value is a 422, never a silent fallback
   and never raw SQL. **A paged endpoint does not have to offer one** — an allow-list of a single
   column is scaffolding with a query parameter on it. Add it with the second column that earns it.
+* **Filters are explicit query parameters.** No generic query language, no OData, no
+  `?filter=field~value` grammar. Every rule below assumes each filter was decided one at a time,
+  and a query language is precisely the thing that stops being true of.
 * **A filter is not an address.** An identifier in the query string that matches nothing yields an
   empty page; a path segment naming a resource that does not exist is a 404. The same identifier
   behaves differently in the two positions, on purpose.
