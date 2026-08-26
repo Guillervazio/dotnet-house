@@ -14,15 +14,36 @@ until a second one consumes it — see [Exit criterion](#exit-criterion-for-v0).
 | `*.md` at the root | The six rule bases. They talk about **roles** — Api, Application, Domain, Contracts, Infrastructure — never about project names |
 | `adr/` | `H###`: decisions that can be dated as doctrine **before** any one project. Each names what sustains it outside this repository, and what it does **not** authorise |
 | `skills/` | Four procedures: `feature-workflow`, `close-increment`, `reconcile-rules`, `ef-migration` |
-| `hooks/` | `stop-gate.ps1` — formats what changed, builds, runs the test projects that need no container, and refuses to end the turn if either fails. Nothing about any repository is written in it: the solution, the test projects and which need a container are all discovered |
+| `agents/` | `rules-reviewer` hunts the rule a change made false; `repo-explorer` answers a question from the four layers that hold the reasoning. Both **report by path** — they write a file and reply with its name, so delegating costs the caller a line instead of a transcript |
+| `hooks/` | `stop-gate.ps1` formats what changed, builds, runs the test projects that need no container, and refuses to end the turn if either fails. `session-doctor.ps1` checks at session start what a suite would otherwise discover three minutes in — the SDK, a container daemon, the environment file — and never blocks. Nothing about any repository is written in either: every target is discovered |
 | `templates/` | A `CLAUDE.md` skeleton to fill in rather than start from nothing |
-| `.claude-plugin/` | The plugin manifest, for `--plugin-dir` |
+| `.claude-plugin/` | `plugin.json`, the manifest; `marketplace.json`, so the package can be installed rather than only read |
 
 ## How a project consumes it
 
-The rules have to end up **inside** the consuming repository's `.claude/rules/shared/`, because
-that is where they are loaded from. The bases link to their decision records as `adr/H###`, which
-resolves as long as the package is mounted whole.
+**Two halves, and only one of them can be a package.**
+
+The skills, the agents and the hooks arrive by installing the plugin. In the consumer's
+`.claude/settings.json`:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "dotnet-house": { "source": { "source": "github", "repo": "Guillervazio/dotnet-house" } }
+  },
+  "enabledPlugins": { "dotnet-house@dotnet-house": true }
+}
+```
+
+The marketplace is added when the folder is trusted, with no separate prompt. A consumer that
+already keeps hand copies of those files **deletes them once the plugin loads** — two skills with
+one name is not a fallback, it is an ambiguity.
+
+The rules cannot travel that way. There is no `rules` field in a plugin manifest, so they have to
+end up **inside** the consuming repository's `.claude/rules/shared/`, which is where they are
+loaded from. Copy them, and rewrite the `adr/H###` links to wherever that project keeps its copy of
+the records. That copy is the drift this repository has not yet closed; it is the open problem, not
+a design.
 
 
 ### The one thing every consumer edits
@@ -82,6 +103,22 @@ The default for a new decision is **P**, in the consuming project.
 Promoting is a file move. Demoting is an investigation. That asymmetry is the whole argument for
 the default.
 
+### What was born here instead of promoted
+
+`agents/` and `session-doctor.ps1` did not arrive through that door. They were written here first,
+with one project consuming the package and none having taken the decision independently — which is
+exactly what the default above exists to prevent.
+
+The easy excuse is false and worth refusing in writing: a project **can** hold `.claude/agents/`
+and its own hooks, so the P form existed and was not used. What was chosen instead was reach — an
+artefact that only ever exists in one repository teaches that repository nothing about whether it
+is portable, and these three are the first things here whose portability the discovery logic can
+actually be tested on.
+
+The debt is recorded rather than paid: until a second project exercises them, they carry **less**
+evidence than every other file here, not the same amount. The exit criterion below is where that
+gets settled.
+
 ## Exit criterion for v0
 
 This package is **v1** when a project B, in another domain, closes **two complete increments**
@@ -90,6 +127,11 @@ consuming it, and at the end of the second:
 * it deviated from **at most one** base clause, recorded as a project decision record;
 * it never had to edit a base from inside its own repository;
 * the Stop hook ran in B **without** a `stop-gate.config.json` — the discovery got it right alone;
+* the session doctor ran in B **without** a `session-doctor.config.json`, and its verdict on B's
+  container requirement matched what B's suites actually needed;
+* both agents were invoked in B at least once, and the reviewer's findings there cited B's own
+  appendix rather than the base — an agent that only ever quotes the portable half has not been
+  shown to read the half that varies;
 * the mandatory tables in `testing` and `build-and-packages` are complete by their own stated
   condition.
 
