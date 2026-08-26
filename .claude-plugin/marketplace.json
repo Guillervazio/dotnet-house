@@ -9,5 +9,6 @@
       "source": "./",
       "description": "House conventions for .NET solutions: the portable half of the rules, the decisions that predate any one project, the procedures worth invoking, a reviewer and an explorer that report by path, and two hooks that refuse to start a session on a broken environment or end a turn on a broken build."
     }
-  ]
+  ],
+  "description": "The portable half of a .NET solution's context, as one installable package: the rule bases' companions, the procedures worth invoking, two agents that report by path, and two hooks that check the environment and the build."
 }
