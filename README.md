@@ -24,6 +24,36 @@ The rules have to end up **inside** the consuming repository's `.claude/rules/sh
 that is where they are loaded from. The bases link to their decision records as `adr/H###`, which
 resolves as long as the package is mounted whole.
 
+
+### The one thing every consumer edits
+
+Each base opens with a `paths:` block, and **two of them name project files**:
+
+```yaml
+# api-guidelines.md
+paths:
+  - "src/Inventory.Api/**/*.cs"          # <- your API project
+  - "src/Inventory.Contracts/**/*.cs"
+  - "tests/Inventory.IntegrationTests/**/*.cs"
+  - "tests/Inventory.ScenarioTests/**/*.cs"
+
+# entity-framework.md
+paths:
+  - "src/Inventory.Infrastructure/**/*.cs"
+  - "tests/Inventory.PersistenceTests/**/*.cs"
+```
+
+They are left as the originating project's names on purpose, as a worked example rather than a
+placeholder nobody has run. **Adapting them is not a deviation**: `paths:` decides *when* a rule
+loads, not *what* it requires, so changing it touches no clause and needs no decision record. The
+other four bases are already generic — `**/*.cs`, `src/**/*.cs`, `tests/**/*.cs`, `**/*.csproj` —
+and need nothing.
+
+A wildcard form, `src/*.Infrastructure/**/*.cs`, would remove even this step. It is **not shipped,
+because it has not been verified to match.** A rule whose `paths:` silently matches nothing is
+invisible, which is the worst failure mode a rule has, so it stays out until somebody confirms it
+in a fresh session.
+
 Each area is then two files in the consumer:
 
 * `shared/<area>.md` — from here. **Never edited from inside a consuming project.**

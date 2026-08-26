@@ -18,6 +18,17 @@ dotnet test             # every project, including the ones needing a container
 **Zero skipped, zero ignored, zero flaky.** "Tests pass in full" is satisfied by a suite full of
 skipped tests, so read the counts rather than the word `Passed`.
 
+**A green suite does not mean the repository restores.** An incremental restore skips the
+vulnerability audit, so a package advisory published since your last cold restore fails a fresh
+clone and CI while every local run stays green. Before closing an increment:
+
+```bash
+dotnet restore --force
+```
+
+This repository shipped a high-severity transitive advisory that broke a clean restore of three
+projects while `dotnet test` reported 640 passing.
+
 The Stop hook runs the build and the fast suite every turn. It does **not** run the
 container-backed suites, so this is the first point at which they have been executed.
 
