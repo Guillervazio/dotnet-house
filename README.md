@@ -39,6 +39,16 @@ The marketplace is added when the folder is trusted, with no separate prompt. A 
 already keeps hand copies of those files **deletes them once the plugin loads** — two skills with
 one name is not a fallback, it is an ambiguity.
 
+That deletion matters most for a hook, for a reason a skill does not have: **a hook that cannot
+find its script does not fail loudly.** The harness reports it with a non-blocking status code, the
+turn ends normally, and nothing on screen says the gate did not run. So while a consumer still
+keeps a copy declared in its own `.claude/settings.json`, write that command's path **relative** to
+the repository root — `.claude\hooks\stop-gate.ps1`. `$CLAUDE_PROJECT_DIR` is **not** substituted
+there: it reaches the shell verbatim, resolves to nothing, and the entry silently points at a file
+that does not exist. Only `${CLAUDE_PLUGIN_ROOT}`, inside a plugin's own `hooks.json`, is expanded
+by the harness. This is not hypothetical — it is how the originating project came to believe it had
+two gates while it had one, for as long as the copy was kept.
+
 The rules cannot travel that way. There is no `rules` field in a plugin manifest, so they have to
 end up **inside** the consuming repository's `.claude/rules/shared/`, which is where they are
 loaded from. Copy them, and rewrite the `adr/H###` links to wherever that project keeps its copy of
