@@ -66,6 +66,21 @@ unmoved a consumer keeps running the old package, is told its plugin is up to da
 to notice — the same silent staleness as the hook above, one layer out. This paragraph exists
 because that is exactly what happened to the commit immediately before it.
 
+**A bumped version also ships exactly once.** A second change merged under a number the cache has
+already taken is hidden *better* than the first, because the answer improves while staying wrong:
+`claude plugin update` now reports *"already at the latest version (0.2.1)"* — the number you
+expected — while serving the content of whichever merge reached that number first. Neither the
+marketplace clone nor the CLI can tell you this. The only thing that can is the cache itself:
+
+```bash
+ls ~/.claude/plugins/cache/<marketplace>/<plugin>/     # one directory per version taken
+grep -r "the sentence you just changed" ~/.claude/plugins/cache/<marketplace>/<plugin>/<version>/
+```
+
+So the version moves **per merge**, not per branch. This paragraph, too, exists because of the
+commit immediately before it: 0.2.1 was merged and cached, and a correction pushed to the same
+branch afterwards was merged under the same number and never reached the one consumer there is.
+
 The rules cannot travel that way. There is no `rules` field in a plugin manifest, so they have to
 end up **inside** the consuming repository's `.claude/rules/shared/`, which is where they are
 loaded from. Copy them, and rewrite the `adr/H###` links to wherever that project keeps its copy of
