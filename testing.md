@@ -42,8 +42,8 @@ conforms to every rule here and still takes minutes to tell you anything.
 Completeness: **every** project referencing `Microsoft.NET.Test.Sdk` appears in that table. A
 missing row means the appendix is incomplete, and that is an error to fix before going on. A
 project without a container belongs in the fast gate; one with a container does not. This is the
-same query the Stop hook's discovery runs, so the rule and the hook share one criterion rather than
-two copies of it.
+same query the Stop hook's discovery runs — wherever that hook comes from, this repository's copy
+or the plugin's — so the rule and the hook share one criterion rather than two copies of it.
 
 ## Tools
 

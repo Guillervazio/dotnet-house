@@ -22,7 +22,10 @@ names: those are PascalCase by convention and nothing checks them.
 
 Four more are corrected by `dotnet format` and **not** by the build: `using` order, whitespace,
 redundant `this.`, and `System.Int32` for `int`. They are enforced only because the Stop hook runs
-`dotnet format` every turn. **If that hook is removed, they stop being enforced by anything.**
+`dotnet format` every turn. **If that hook stops running, they stop being enforced by anything** —
+and "stops running" no longer means a file was deleted. Where the gate arrives as a plugin, it also
+covers the plugin failing to resolve or its entry in `enabledPlugins` being turned off, neither of
+which announces itself. Nothing here tells you the conventions went unenforced; you have to check.
 
 One convention nothing checks: an asynchronous method ends with the `Async` suffix.
 
