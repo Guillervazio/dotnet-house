@@ -1,6 +1,6 @@
 ---
 name: repo-explorer
-description: Answer a question about a .NET solution's layout, conventions or history by reading the four layers that hold them — the rule bases, their project appendices, the decision records and the increment log — and report the answer by path. Use for a sweep whose answer needs the reasoning behind the code, not only the code.
+description: Answer a question about a .NET solution's layout, conventions or history by reading the four layers that hold them — the rule bases, their project appendices, the decision records and the increment log. Told to report the answer by path. Use for a sweep whose answer needs the reasoning behind the code, not only the code.
 tools: Read, Glob, Grep, Bash, Write
 effort: medium
 ---

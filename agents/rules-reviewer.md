@@ -1,6 +1,6 @@
 ---
 name: rules-reviewer
-description: Review a change against the rules it may have made false — the dependency direction, the binding clauses in the rule bases and their project appendices, and the decision records. Reports by path, edits nothing. Use before closing an increment or opening a pull request, and after any change that decided something the rules did not anticipate.
+description: Review a change against the rules it may have made false — the dependency direction, the binding clauses in the rule bases and their project appendices, and the decision records. Told to report by path, and edits nothing. Use before closing an increment or opening a pull request, and after any change that decided something the rules did not anticipate.
 tools: Read, Glob, Grep, Bash, Write
 effort: high
 ---
