@@ -58,6 +58,14 @@ find out is to ask the session what it was told, and to break the build on purpo
 block counter under `%TEMP%\claude-stop-gate\`. Do that once per consuming project. Verified to
 exist is not verified to fire, and the distinction is invisible by construction.
 
+**Every change here needs the `version` in `plugin.json` bumped, including a change to prose.** The
+installed copy is cached per version, so `claude plugin marketplace update` refreshes the clone and
+leaves the cache untouched, and `claude plugin update` then answers *"already at the latest version
+(0.2.0)"* and does nothing. Merging to `master` is therefore **not** shipping: with the version
+unmoved a consumer keeps running the old package, is told its plugin is up to date, and has no way
+to notice — the same silent staleness as the hook above, one layer out. This paragraph exists
+because that is exactly what happened to the commit immediately before it.
+
 The rules cannot travel that way. There is no `rules` field in a plugin manifest, so they have to
 end up **inside** the consuming repository's `.claude/rules/shared/`, which is where they are
 loaded from. Copy them, and rewrite the `adr/H###` links to wherever that project keeps its copy of
