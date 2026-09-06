@@ -23,7 +23,7 @@ The session that called you delegated precisely so its context would not fill wi
 
 | Where | Answers |
 |---|---|
-| `.claude/rules/shared/<area>.md` | What is required of **any** solution of this shape. Talks about roles — Api, Application, Domain, Contracts, Infrastructure — never about project names |
+| `.claude/rules/shared/<area>.md` | What is required of **any** solution consuming the package. Talks about roles — an edge that translates, a core that decides — never about project names, and never assuming a particular set of roles: which ones this solution has is the next row's answer |
 | `.claude/rules/<area>.project.md` | Which real project is which role, the concrete names, and any `## Deviations` from a base clause. **This entry wins** over the base clause it names |
 | The decision records | Why, and — the part usually being looked for — what each decision does **not** authorise. `H###` predates any one project; `P###` belongs to this one |
 | The increment log | What was actually built, in order, and what each plan got wrong |

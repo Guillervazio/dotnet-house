@@ -30,9 +30,11 @@ git ls-files '*adr*' 'docs/**/*.md' | head -40   # where the decision records li
 git rev-parse --abbrev-ref HEAD
 ```
 
-The rule bases talk about **roles** — Api, Application, Domain, Contracts, Infrastructure. The
-appendix named `<area>.project.md` is what maps those roles onto real project names. Read the
-appendix first, or you will not know which assembly is which role.
+The rule bases talk about **roles** — an edge that translates an input, a core that decides — and
+never about project names. Which roles a solution has, and which assembly is which, is drawn in the
+appendix named `<area>.project.md`. **Read the appendix first**, and do not assume a shape: one
+consumer is a layered web application with five roles, another is three surfaces over a single
+service with three. A review that arrives knowing the answer checks the wrong repository.
 
 ## 1. Get the change
 
@@ -74,10 +76,12 @@ other to be believed, and the stale copy is the one somebody reads.
 
 ## 5. Four checks the skill does not spell out
 
-* **The dependency direction.** `Api → Application → Domain`, `Api → Infrastructure → Application
-  → Domain`, `Api → Contracts ← Application`, and `Domain →` nothing. Check the `using` blocks and
-  the project references, not the prose. `Domain → Infrastructure`, `Domain → Application` and
-  `Application → Infrastructure` are forbidden outright.
+* **The dependency direction, as that project draws it.** `architecture.project.md` carries the
+  graph and names the edges forbidden outright. Check the `using` blocks and the project references
+  against **that** graph, not against a remembered one — the base stopped asserting a particular
+  shape when a second consumer turned out to have another. An edge present in the code and absent
+  from the drawing is a finding either way: either the code broke the rule or the rule has gone
+  stale, and both are worth reporting.
 * **Deviations live in one place.** A project clause that contradicts a base clause is only a
   deviation if it sits under `## Deviations` in that area's appendix and names the clause it
   replaces. Anywhere else it is drift, and it is a finding.
