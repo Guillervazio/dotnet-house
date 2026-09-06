@@ -25,7 +25,11 @@ test suite says nothing about why.>
 
 ## Dependency direction
 
-Never violate it:
+Never violate it. Draw **your** graph here, not this one — the five-role shape below is one
+solution's answer, kept as a worked example. A three-project service with three surfaces over one
+core is as valid, and `architecture.md` requires only that the graph be written down, that the
+forbidden edges be named as edges, and that any edge which is not a leaf pointing at the core carry
+its reason.
 
 ```
 Api → Application → Domain
