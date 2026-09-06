@@ -11,7 +11,8 @@ until a second one consumes it — see [Exit criterion](#exit-criterion-for-v0).
 
 | | |
 |---|---|
-| `*.md` at the root | The six rule bases. They talk about **roles** — Api, Application, Domain, Contracts, Infrastructure — never about project names |
+| `*.md` at the root | The five rule bases. They talk about **roles** — an edge that translates, a core that decides — never about project names |
+| `shapes/` | What a base looked like before a second consumer showed it to be one project's decision. **Nothing inherits a shape.** A project that wants one copies the clauses into its own appendix, where they become its rules and can be changed without asking anybody. `clean-architecture.md` is the first, and the demotion that produced it is [below](#the-first-demotion-and-what-it-cost) |
 | `adr/` | `H###`: decisions that can be dated as doctrine **before** any one project. Each names what sustains it outside this repository, and what it does **not** authorise |
 | `skills/` | Four procedures: `feature-workflow`, `close-increment`, `reconcile-rules`, `ef-migration` |
 | `agents/` | `rules-reviewer` hunts the rule a change made false; `repo-explorer` answers a question from the four layers that hold the reasoning. Both are **told to report by path** — write a file, reply with its name. Read that as an intention, not a behaviour: [it has been observed not to happen](#the-path-contract-is-not-holding) |
@@ -108,14 +109,25 @@ paths:
 
 They are left as the originating project's names on purpose, as a worked example rather than a
 placeholder nobody has run. **Adapting them is not a deviation**: `paths:` decides *when* a rule
-loads, not *what* it requires, so changing it touches no clause and needs no decision record. The
-other four bases are already generic — `**/*.cs`, `src/**/*.cs`, `tests/**/*.cs`, `**/*.csproj` —
-and need nothing.
+loads, not *what* it requires, so changing it touches no clause and needs no decision record.
 
-A wildcard form, `src/*.Infrastructure/**/*.cs`, would remove even this step. It is **not shipped,
-because it has not been verified to match.** A rule whose `paths:` silently matches nothing is
-invisible, which is the worst failure mode a rule has, so it stays out until somebody confirms it
-in a fresh session.
+The other three are generic — `**/*.cs`, `src/**/*.cs`, `tests/**/*.cs` — and this file used to
+say the same of `build-and-packages.md`, which was wrong in a way worth keeping written down. Its
+`paths:` named the project system, and one of its clauses is about a package version "pinned in
+step with a tool version somewhere else — a container stage, a CI image". No `.csproj` glob has
+ever matched a `Dockerfile` or a workflow file, so the one clause that governs those two arrived
+for neither. It now ships with `global.json`, `Dockerfile` and `.github/workflows/**` as well.
+
+**The general rule the second consumer paid for: an area's `paths:` must name the files its
+clauses talk about, not the files the area is filed under.** When adapting a base's frontmatter,
+read its clauses and ask what each one is *about*; the mismatch is invisible from either end,
+because a rule that never loads and a rule nobody had to obey look identical.
+
+A wildcard form, `src/*.Infrastructure/**/*.cs`, would remove even the renaming step. It is **not
+shipped, because it has not been verified to match.** A rule whose `paths:` silently matches
+nothing is invisible, which is the worst failure mode a rule has, so it stays out until somebody
+confirms it in a fresh session — and "confirms" means watching the rule arrive, not reading the
+glob and agreeing with it.
 
 Each area is then two files in the consumer:
 
@@ -144,6 +156,41 @@ The default for a new decision is **P**, in the consuming project.
 
 Promoting is a file move. Demoting is an investigation. That asymmetry is the whole argument for
 the default.
+
+### The first demotion, and what it cost
+
+The second consumer is `agent-relay-channel`: a hub on a LAN that lets CLI agents from different
+providers ask each other questions, three surfaces over one service, no ORM and no web application
+shape at all. It reached `architecture.md` and would have had to deviate from **five** clauses —
+the five-role graph, what each role must not contain, aggregate-root repositories, vertical slices,
+and handler-based CQRS. The exit criterion below already names the verdict for two or more, so
+there was nothing to decide about whether: only about what survives.
+
+The investigation demotion asks for, run rather than assumed:
+
+* **Who obeys it today.** One project, the originating one, and it depends on every clause rather
+  than coinciding with them. The text is therefore kept whole, in
+  [shapes/clean-architecture.md](shapes/clean-architecture.md), and that project keeps following it
+  by copying the clauses into its own appendix — where they always belonged.
+* **What both obey, independently.** Four clauses, and the word is load-bearing: the second
+  consumer wrote its own `architecture.project.md` from scratch **after** rejecting the base, so
+  these are not agreement by copying. The dependency graph written down as roles with its forbidden
+  edges named; an edge role that translates and does not decide; no new architectural patterns, with
+  H002's test on the first interface; and a mandatory table of where a type goes. Those four are
+  the new `architecture.md`.
+* **What was let go.** Everything that assumed a database behind a web API. Nothing in this package
+  should have been asserting that, and for four months it was.
+
+What this does not authorise: reading "thin" as a target. A base earns its clauses by two projects
+holding them apart from each other, and the four above are what that produced this time. The next
+demotion is not evidence that bases should be shorter — it is evidence that a particular one was
+written from one repository's shape, which is a different mistake with the same symptom.
+
+The v1 criterion is **not** met and this does not move it closer. It says a project B deviating
+from two or more base clauses means those bases were project decisions in disguise; B deviated from
+several across `coding-conventions`, `testing` and `api-guidelines` as well, and each of those is
+still a base with the deviation recorded in B's appendix. Only the architecture one was demoted,
+because only there did the count reach five and the shape itself turn out to be the assumption.
 
 ### What was born here instead of promoted
 
@@ -201,4 +248,5 @@ consuming it, and at the end of the second:
   condition.
 
 If B needs to deviate from two or more, those bases were project decisions in disguise, and they
-are demoted before v1 is declared.
+are demoted before v1 is declared. One already has been:
+[the first demotion](#the-first-demotion-and-what-it-cost).
